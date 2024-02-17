@@ -100,43 +100,33 @@ class Workout {
 class App {
   constructor() {
     this._tracker = new CalorieTracker();
-
-    document.getElementById('meal-form').addEventListener('submit', this._addMeal.bind(this));
-    document.getElementById('workout-form').addEventListener('submit', this._addWorkout.bind(this));
+    document
+      .getElementById('meal-form')
+      .addEventListener('submit', this._newItem.bind(this, 'meal'));
+    document
+      .getElementById('workout-form')
+      .addEventListener('submit', this._newItem.bind(this, 'workout'));
   }
 
-  _addMeal(e) {
+  _newItem(type, e) {
     e.preventDefault();
-    const name = document.getElementById('meal-name');
-    const calories = document.getElementById('meal-calories');
+    const name = document.getElementById(`${type}-name`);
+    const calories = document.getElementById(`${type}-calories`);
     if (name.value === '' || calories.value === '') {
       alert('Please enter a meal name and calories');
       return;
     }
-    const meal = new Meal(name.value, +calories.value);
-    this._tracker.addMeal(meal);
-    name.value = '';
-    calories.value = '';
-    const mealCollapse = document.getElementById('collapse-meal');
-    const bsCollapse = new bootstrap.Collapse(mealCollapse, {
-      toggle: true,
-    });
-  }
-
-  _addWorkout(e) {
-    e.preventDefault();
-    const name = document.getElementById('workout-name');
-    const calories = document.getElementById('workout-calories');
-    if (name.value === '' || calories.value === '') {
-      alert('Please enter a meal name and calories');
-      return;
+    if (type === 'meal') {
+      const meal = new Meal(name.value, +calories.value);
+      this._tracker.addMeal(meal);
+    } else {
+      const workout = new Workout(name.value, +calories.value);
+      this._tracker.addWorkout(workout);
     }
-    const workout = new Workout(name.value, +calories.value);
-    this._tracker.addWorkout(workout);
     name.value = '';
     calories.value = '';
-    const workoutCollapse = document.getElementById('collapse-workout');
-    const bsCollapse = new bootstrap.Collapse(workoutCollapse, {
+    const itemCollapse = document.getElementById(`collapse-${type}`);
+    const bsCollapse = new bootstrap.Collapse(itemCollapse, {
       toggle: true,
     });
   }
