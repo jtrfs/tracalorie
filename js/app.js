@@ -26,6 +26,35 @@ class CalorieTracker {
     this._displayNewWorkout(workout);
     this._render();
   }
+  removeMeal(id) {
+    const index = this._meals.findIndex(meal => meal.id === id);
+    if (index !== -1) {
+      const meal = this._meals[index];
+      this._totalCalories -= meal.calories;
+      this._meals.splice(index, 1);
+      this._render();
+    }
+  }
+  removeWorkout(id) {
+    const index = this._workouts.findIndex(workout => workout.id === id);
+    if (index !== -1) {
+      const workout = this._workouts[index];
+      this._totalCalories += workout.calories;
+      this._workouts.splice(index, 1);
+      this._render();
+    }
+  }
+  reset() {
+    this._meals = [];
+    this._workouts = [];
+    this._totalCalories = 0;
+    this._render();
+  }
+  setLimit(limit) {
+    this._calorieLimit = limit;
+    this._displayCaloriesLimit();
+    this._render();
+  }
 
   // private methods //
   _displayCaloriesTotal() {
@@ -148,6 +177,20 @@ class App {
     document
       .getElementById('workout-form')
       .addEventListener('submit', this._newItem.bind(this, 'workout'));
+    document
+      .getElementById('meal-items')
+      .addEventListener('click', this._removeItem.bind(this, 'meal'));
+    document
+      .getElementById('workout-items')
+      .addEventListener('click', this._removeItem.bind(this, 'workout'));
+    document
+      .getElementById('filter-meals')
+      .addEventListener('keyup', this._filterItems.bind(this, 'meal'));
+    document
+      .getElementById('filter-workouts')
+      .addEventListener('keyup', this._filterItems.bind(this, 'workout'));
+    document.getElementById('reset').addEventListener('click', this._reset.bind(this));
+    document.getElementById('limit-form').addEventListener('submit', this._setLimit.bind(this));
   }
 
   _newItem(type, e) {
@@ -171,6 +214,53 @@ class App {
     const bsCollapse = new bootstrap.Collapse(itemCollapse, {
       toggle: true,
     });
+  }
+  _removeItem(type, e) {
+    if (e.target.classList.contains('delete') || e.target.classList.contains('fa-xmark')) {
+      if (confirm(`Are you sure you want to delete this ${type}?`)) {
+        const id = e.target.closest('.card').dataset.id;
+        type === 'meal' ? this._tracker.removeMeal(id) : this._tracker.removeWorkout(id);
+        e.target.closest('.card').remove();
+      }
+    }
+  }
+  _filterItems(type, e) {
+    const text = e.target.value.toLowerCase();
+    document.querySelectorAll(`#${type}-items .card`).forEach(item => {
+      const name = item.firstElementChild.firstElementChild.textContent.toLowerCase();
+      if (name.indexOf(text) !== -1) {
+        item.style.display = 'block';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  }
+  _reset() {
+    this._tracker.reset();
+    document.getElementById('meal-items').innerHTML = '';
+    document.getElementById('workout-items').innerHTML = '';
+    document.getElementById('filter-meals').value = '';
+    document.getElementById('filter-workouts').value = '';
+  }
+  _setLimit(e) {
+    e.preventDefault();
+    const limit = document.getElementById('limit');
+    if (limit.value === '') {
+      alert('Please enter a LIMIT');
+      limit.focus();
+      return;
+    }
+    if (isNaN(+limit.value)) {
+      alert('Please enter a NUMBER');
+      limit.value = '';
+      limit.focus();
+      return;
+    }
+    this._tracker.setLimit(+limit.value);
+    limit.value = '';
+    var modalEl = document.getElementById('limit-modal');
+    var modal = bootstrap.Modal.getInstance(modalEl); // Returns a Bootstrap modal instance
+    modal.hide();
   }
 }
 
