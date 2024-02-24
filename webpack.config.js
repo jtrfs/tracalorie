@@ -41,6 +41,7 @@ module.exports = {
       title: 'Webpack Starter',
       filename: 'index.html',
       template: './src/index.html',
+      favicon: './src/favicon.ico',
     }),
   ],
 };
