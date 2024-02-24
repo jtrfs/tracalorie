@@ -1,3 +1,4 @@
+// new branch tracalorie-webpack created from main
 class CalorieTracker {
   constructor() {
     this._calorieLimit = Storage.getCalorieLimit();
