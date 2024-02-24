@@ -1,8 +1,8 @@
 {
-  "name": "project-name",
+  "name": "tracalorie-webpack",
   "version": "1.0.0",
-  "description": "???",
-  "main": "index.js",
+  "description": "App to track calories, meals and workouts",
+  "main": "app.js",
   "scripts": {
     "build": "webpack",
     "dev": "webpack serve"
